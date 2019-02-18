@@ -7,10 +7,10 @@ machine learning models
 """
 class CleanData(luigi.ExternalTask):
 
-    def output(self):
+    def output(self) -> luigi.LocalTarget:
         return luigi.LocalTarget('data/clean_titanic_data.csv')
 
-    def run(self):
+    def run(self) -> None:
         data = pd.read_csv("../datasets/titanic.tsv", sep="\t")
         # Fill Age NaNs with mean value
         data["Age"].fillna(data["Age"].mean(), inplace=True)
