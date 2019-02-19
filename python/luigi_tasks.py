@@ -1,8 +1,8 @@
 import luigi
 import pandas as pd
 import typing as tg
-import tensorflow as tf
-
+from model import build_keras_model
+from sklearn.model_selection import GridSearchCV
 """
 This task cleans the data and prepares it so we can train our
 machine learning models
@@ -17,14 +17,14 @@ class CleanData(luigi.ExternalTask):
         data = pd.read_csv("../datasets/titanic.tsv", sep="\t")
         # Fill Age NaNs with mean value
         data["Age"].fillna(data["Age"].mean(), inplace=True)
-        # Drop all other NaN value
-        data = data.dropna()
         # Drop columns that we won't use
         data = data.drop(["Name", "Cabin", "Ticket", "PassengerId"], axis=1)
+        # Drop all other NaN value
+        data = data.dropna()
         # OneHotEncode this columns
         data = pd.get_dummies(data, columns=["Embarked", "Sex"])
         with self.output().open('w') as out:
-            data.to_csv(out)
+            data.to_csv(out, index=False)
 
 """
 This task splits the data into training and testing data
@@ -46,10 +46,13 @@ class TrainAndTestData(luigi.Task):
             data = pd.read_csv(input_file)
         train_data = data.sample(frac=0.7)
         test_data = data.drop(train_data.index)
+        print(data)
+        print(train_data)
+        print(test_data)
         with self.output()["train"].open("w") as train_out:
-            train_data.to_csv(train_out)
+            train_data.to_csv(train_out, index=False)
         with self.output()["test"].open("w") as test_out:
-            test_data.to_csv(test_out)
+            test_data.to_csv(test_out, index=False)
 """
 This tasks train the machine learning model and validates it using the training and test data
 """
@@ -64,8 +67,16 @@ class TrainModel(luigi.Task):
 
 
     def run(self) -> None:
-        model = tf.keras.Sequential([
-            tf.layers.Dense(64, activation='relu', input_dims=11),
-            tf.layers.Dense(64, activation='relu'),
-            tf.layers.Dense(2, activation='softmax')
-        ])
+        model = build_keras_model(epochs=500)
+        print(self.input())
+        with self.input()["train"].open('r') as train:
+            training_data = pd.read_csv(train)
+        x_train = training_data.drop("Survived", axis=1)
+        y_train = training_data.Survived
+        model.fit(x_train.values, y_train.values)
+        with self.input()["test"].open('r') as test:
+            test_data = pd.read_csv(test)
+        x_test = test_data.drop("Survived", axis=1)
+        y_test = test_data.Survived
+        score = model.score(x_test.values, y_test.values)
+        print(score)
