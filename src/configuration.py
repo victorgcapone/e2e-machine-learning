@@ -1,6 +1,6 @@
 import yaml
 
-with open("../configs.yaml", "r") as conf:
+with open("configs.yaml", "r") as conf:
     config = yaml.load(conf)
 
 

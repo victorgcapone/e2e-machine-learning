@@ -1,4 +1,4 @@
-# Should be a directory above the luigi tasks python code
+# Should in the same cirectory as configuration.py and the rest of the python code 
 
 # Configuration for the data files
 data:
