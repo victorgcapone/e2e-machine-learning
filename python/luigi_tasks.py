@@ -3,6 +3,7 @@ import pandas as pd
 import typing as tg
 from model import build_keras_model
 import h5py
+from configuration import config
 
 """
 This task cleans the data and prepares it so we can train our
@@ -11,11 +12,11 @@ machine learning models
 class CleanData(luigi.ExternalTask):
 
     def output(self) -> luigi.LocalTarget:
-        return luigi.LocalTarget('../data/clean_titanic_data.csv')
+        return luigi.LocalTarget(config["data"]["clean"])
 
 
     def run(self) -> None:
-        data = pd.read_csv("../datasets/titanic.csv")
+        data = pd.read_csv(config["data"]["raw"])
         # Fill Age NaNs with mean value
         data["Age"].fillna(data["Age"].mean(), inplace=True)
         # Drop columns that we won't use
@@ -34,8 +35,8 @@ class TrainAndTestData(luigi.Task):
 
     def output(self) -> tg.Dict[str, luigi.LocalTarget]:
         # Not recomended, but this is just an example, ideally we would split the task in two and retur a single Target
-        return {"train" : luigi.LocalTarget("../data/train_data.csv"),
-                "test" : luigi.LocalTarget("../data/test_data.csv")}
+        return {"train" : luigi.LocalTarget(config["data"]["train"]),
+                "test" : luigi.LocalTarget(config["data"]["test"])}
 
 
     def requires(self) -> luigi.Task:
@@ -60,8 +61,8 @@ This tasks train the machine learning model and validates it using the training 
 class TrainModel(luigi.Task):
 
     def output(self) -> luigi.LocalTarget:
-        return {"model" : luigi.LocalTarget("../model/model.yaml"),
-                "weights" : luigi.LocalTarget("../model/weights.h5")}
+        return {"model" : luigi.LocalTarget(config["model"]["path"]),
+                "weights" : luigi.LocalTarget(config["model"]["weights"])}
 
 
     def requires(self) -> luigi.Task:
