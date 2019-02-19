@@ -1,4 +1,4 @@
-# Should in the same cirectory as configuration.py and the rest of the python code 
+# Should be in the same directory as configuration.py and the rest of the python code 
 
 # Configuration for the data files
 data:
