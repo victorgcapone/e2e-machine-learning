@@ -9,5 +9,5 @@ data:
 
 # Configuration for the model files
 model:
-  path: './model/model.yaml'
-  weights: './model/weights.h5'
+  path: '../model/model.yaml'
+  weights: '../model/weights.h5'
