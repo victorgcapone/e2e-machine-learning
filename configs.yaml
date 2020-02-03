@@ -1,0 +1,13 @@
+# Should be in the same directory as configuration.py and the rest of the python code 
+
+# Configuration for the data files
+data:
+  raw: './datasets/titanic.csv'
+  clean: './data/clean_titanic_data.csv'
+  train: './data/training_data.csv'
+  test: './data/test_data.csv'
+
+# Configuration for the model files
+model:
+  path: './model/model.yaml'
+  weights: './model/weights.h5'
